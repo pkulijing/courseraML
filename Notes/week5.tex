@@ -1,0 +1,88 @@
+\ifx\PREAMBLE\undefined
+\input{preamble}
+\begin{document}
+\fi
+\subsection{Cost function}
+Recall that we have the following cost function for regularized logistic regression
+\begin{equation}
+J(\theta) = -\frac{1}{m}\sum\limits_{i=1}^m\left[y^{(i)}log(h_{\theta}(x^{(i)})) + (1-y^{(i)})(log(1-h_{\theta}(x^{(i)})))\right] + \frac{\lambda}{2m}\sum\limits_{j=1}^{n}\theta_j^2
+\end{equation}
+Supose we are trying to solve a K-classification problem with neural network. The cost function of neural network is its generalization
+\begin{equation}
+\begin{split}
+J(\Theta) = &-\frac{1}{m}\sum\limits_{i=1}^m\sum\limits_{k=1}^{K}\left[y^{(i)}_klog(h_{\theta}(x^{(i)}))_k + (1-y^{(i)}_k)(log(1-(h_{\theta}(x^{(i)}))_k)\right] \\
+&+ \frac{\lambda}{2m}\sum\limits_{l=1}^{L-1}\sum\limits_{i=1}^{s_l}\sum\limits_{j=1}^{s_{l+1}}(\Theta_{ji}^{(l)})^2
+\end{split}
+\end{equation}
+in which $L$ is the number of layers. Note that the regularization term does not include $\Theta_{j0}$, which is related to the bias term.
+
+In order to minimize $J(\Theta)$ using gradient descent or other methods, we need to compute $\frac{\partial J(\Theta)}
+{\partial \Theta_{ij}}$ for all $i,j$. The method to do this is called backpropagation.
+\subsection{Backpropagation}
+Consider one specific training example $(x,y)$. Intuitively speaking, in the backpropagation algorithm, we use $\delta_j^{(l)}$ to denote the ``error'' of node $j$ in layer $l$. For the output layer (layer $L$), we have 
+\begin{equation}
+\delta_j^{(L)} = a_j^{(L)} - y_j
+\end{equation}
+or in the vectorized way
+\begin{equation}
+\delta^{(L)} = a^{(L)} - y
+\end{equation}
+in which $a^{(L)} = h_{\Theta}(x)$ because this is the output layer. For other layers, we have
+\begin{equation}
+\delta^{(l)} = (\Theta^{(l)})^{\mathsf T}\delta^{(l+1)} .* g'(z^{(l)}),  l = L - 1, L - 2 \dots 2.
+\end{equation}
+Note that the result of $(\Theta^{(l)})^{\mathsf T}\delta^{(l+1)}$ is a vector of dimension $s_l + 1$, while $g'(z^{(l)})$ is of dimension $s_l$. Since we expect $\delta^{(l)}$ to be of dimension $s_l$, the first component (the 0th) of $(\Theta^{(l)})^{\mathsf T}\delta^{(l+1)}$ should be discarded.
+
+There is no $\delta^{(1)}$ item because contained in layer 1 are the inputted features of the training example who do not have any ``error'' associated with them. It's straightforward to demonstrate that $g'(x) = g(x)(1 - g(x))$,  thus we have
+\begin{equation}
+\delta^{(l)} = (\Theta^{(l)})^{\mathsf T}\delta^{(l+1)} .* \left[a^{(l)}(1 - a^{(l)})\right], l = L - 1, L - 2 \dots 2.
+\end{equation}
+
+With all $\delta^{(l)}(l=2,3\dots L)$ defined, we now present how the backpropagation algorithm works for a more general training set containing $m$ training examples. We define $\Delta^{(l)}_{ij} = 0$ for all $l,i,j$, then loop over $i$ from 1 to $m$:
+\begin{enumerate}
+\item Set $a^{(1)}=x^{(i)}$
+\item Forward propagation: calculate $a^{(l)}, l=2,3\dots L$
+\item Backpropagation: calculate $\delta^{(l)}, l=L,L-1\dots 2$
+\item $\Delta^{(l)} \coloneqq \Delta^{(l)} + \delta^{(l+1)}\left(a^{(l)}\right)^{\mathsf T}$
+\end{enumerate}
+After obtaining $\Delta^{(l)}_{ij}$, we define $D^{(l)}_{ij}$ as follow
+\begin{equation}\begin{split}
+D_{ij}^{(l)} \coloneqq & \frac{1}{m}\Delta^{(l)}_{ij} + \lambda\Theta_{ij}^{(l)}\text{, if }j\neq0\\
+D_{ij}^{(l)} \coloneqq & \frac{1}{m}\Delta^{(l)}_{ij}\text{, if }j=0\\
+\end{split}
+\end{equation}
+Then we have
+$D^{(l)}_{ij} = \frac{\partial}{\partial \Theta_{ij}}J(\Theta)$.
+
+The implementation of the backpropagation algorithm requires a lot of mathematical details and is thus quite errorprone. In order to check whether our imeplementation is correct, it is helpful to do the {\bf gradient checking}, i.e. comparing the $\frac{\partial}{\partial \theta_{i}}J(\theta)$ calculated by backpropagation against the numerical value calculated by 
+$$\frac{\partial}{\partial \theta_i}J(\theta) = \frac{J(\theta_1\dots\theta_i + \epsilon\dots\theta_n)-J(\theta_1\dots\theta_i - \epsilon\dots\theta_n)}{2\epsilon}$$
+Here $\theta$ becomes a 1d vector because in matlab and octave, when minimizing a function with advanced methods(e.g. fminunc), it is required that the gradient be provided in the form of a vector rather than a matrix. In order to comply with this requirement, the $\Theta$ matrices need to be unrolled together. The code looks like
+\begin{lstlisting}
+thetaVec = [Theta1(:); Theta2(:); Theta3(:)];
+\end{lstlisting}
+The code for the reversal looks like
+\begin{lstlisting}
+Theta1 = reshape(Theta1(1:110), 10, 11);
+Theta2 = reshape(Theta1(111:220), 10, 11);
+Theta3 = reshape(Theta1(221:231), 1, 11);
+\end{lstlisting}
+
+The initial choice of $\Theta$ is subtle. {\bf Symmetry breaking} requires that the matrices be randomly initialized. We will initialize each matrix item with a random value within the range of $(-\epsilon, \epsilon)$. The code looks like
+\begin{lstlisting}
+Theta1 = rand(10,11) * 2 * INIT_EPSILON - INIT_EPSILON;
+\end{lstlisting}
+\subsection{Summary}
+Here is a summary of the implementation of neural network learning algorithm.
+\begin{enumerate}
+\item Randomly initialze weight matrices ($\Theta^{(l)}$).
+\item Implement forward propagation to calculate $h_{\Theta}(x^{(i)})$ with $x^{(i)}$.
+\item Implement calculation of the cost function $J(\Theta)$.
+\item Implement backpropagation to calculate $\frac{\partial}{\partial \Theta_{ij}}J(\Theta)$.
+\item Implement gradient checking to verify the correctness of $\frac{\partial}{\partial \Theta_{ij}}J(\Theta)$ results gained above. Then disable this part of the code to ensure efficiency.
+\item Use gradient descent or other optimization methods to minimize $J(\Theta)$.
+\end{enumerate}
+
+$J(\Theta)$ is not necessarily convex for neural network, which means it is possible that we wind up at a local minimum rather than the global minimum. In reality this seldom causes problem because even if a local minimum is obtained, it is not too far away from the global minimum and is thus an acceptable solution.
+\ifx\PREAMBLE\undefined
+\end{document}
+\fi

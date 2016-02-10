@@ -1,0 +1,97 @@
+\ifx\PREAMBLE\undefined
+\input{preamble}
+\begin{document}
+\fi
+\section{Anomaly detection}
+\subsection{Introduction}
+Anomaly detection is an unsupervised learning problem that has some aspects similar to supervised learning problem. 
+
+Given $m$ normal(non-anomalous) examples $x^{(1)}, x^{(2)}, \dots, x^{(m)}$, we are supposed to tell whether a new example $x_{test}$ is anomalous. The approach we will take is to build a density model $p(x)$ and choose a threshold $\epsilon$. If $p(x_{test}) \ge \epsilon$, the new example $x_{test}$ is flagged normal; otherwise it is recognized as an anomaly.  
+
+Anomaly detection could be used in fraud detection. Also it can be used to decide whether a product is up to the normal quality standard in manufacturing. What's more, it can be used to monitor the status of computers in a data center.
+\subsection{Algorithm}
+Suppose the training examples $x^{(i)}\in \mathbb{R}^n$. We will assume that 
+\begin{equation*}
+p(x) = \prod\limits_{i=1}^{n}p(x_i;\mu_i, \sigma_i^2)
+\end{equation*}
+in which $p(x_i;\mu_i, \sigma_i^2)$ means $x_i\sim \mathcal{N}(\mu_i, \sigma_i^2)$. We are actually taking for granted that different features $x_i$ are independent. Although this is not always true, it does not harm the correctness of the algorithm.
+
+First we will pick out the features $x_i$ that might be indicative of anomalous examples. Then we fit the parameters $\mu_i, \sigma_i^2$ with 
+\begin{equation}
+\begin{split}
+\mu_j &= \frac{1}{m}\sum\limits_{i=1}^{m}x_j^{(i)}\\
+\sigma_j^2 &= \frac{1}{m}\sum\limits_{i=1}^{m}(x_j^{(i)} - \mu_j)^2.
+\end{split}\end{equation}
+Now that we have the model
+\begin{equation}
+p(x) = \prod\limits_{j=1}^{n}p(x_j;\mu_j, \sigma_j^2) = \prod\limits_{j=1}^{n}\frac{1}{\sqrt{(2\pi)}\sigma_j}\exp\left(-\frac{(x_j-\mu_j)^2}{2\sigma_j^2}\right),
+\end{equation}
+we can calculate $p(x_{test})$ for any new example $x_{test}$ and tell whether it is an anomaly.
+\subsection{Developing and evaluating an anomaly detection system}
+Assume we have some labeled data with anomalous and non-anomalous examples (y=0 normal, y=1 anomalous). In order to choose an superior anomaly detection algorithm, we will divide the training examples into, as usual, training set, cross-validation set and test set. Note that in this case, the training set contains only normal examples, while the cv set and the test set contain both normal and anomalous examples.
+
+In a typical case, if we have 10000 normal examples and 20 anomalies, we can put 6000 normal examples into the training set, 2000 normal exmaples and 10 anomalies into the cv set, and 2000 normal examples and 10 anomalies into the test set.
+
+First, we will fit the model $p(x)$ with the training set $\{x^{(1)},\dots,x^{(m)}\}$. Then, we will make predictions for the examples in the cv set with
+\begin{equation}
+y=\left\{
+\begin{aligned}
+1&\text{ if }p(x) < \epsilon\text{ (anomaly)}\\
+0&\text{ if }p(x) \ge \epsilon\text{ (normal)}
+\end{aligned}
+\right..
+\end{equation}
+Since the data is quite skewed (most examples are normal), predication accuracy is not a good evaluation metric. We can calculate the numbers of true positive, false positive, true negative, false negative, and then calculate {\bf Precision/Recall}, and finally evaluate the algorithm with the $F_1$ score.
+
+We will choose the value of $\epsilon$ that privides the best $F_1$ score on the cv set. Then the algorithm can be evaluated by applying the model on the test set.
+\subsection{Anomaly detection v.s. supervised learning}
+In the section above, we labeled anomalies with $y=1$ in order to properly evaluate the algorithm. This could be confusing since anomaly detection is an unsupervised learning algorithm, while labeling examples is what we do in supervised learning. It seems that the problem could be solved directly with supervised learning methods. Here are some guidelines helping us to decide whether to use anomaly detection or supervised learning when facing a specific problem.
+\begin{enumerate}
+\item Anomaly detection should be used when the number of positive examples is very small while the number of negative examples is large. Supervised learning should be used when there are large number of of both positive and negative examples.
+\item Anomaly detection should be used when there are many ``types'' of anomalies, i.e. it seems unlikely that we are able to predict what future anomalies will look like based on the anomalies that have appeared. Supervised learning should be used when there are enough positive examples to help us get a sense of what an anomaly should ``look like'', i.e. we are confident that future anomalies will be similar to the ones we have seen.
+\end{enumerate}
+\subsection{Choosing features to use}
+The choice of features to be used in anomaly detection can be ambiguous and subtle.
+
+When a feature does not ``look gaussian'' according to its histogram, we can make appropriate transformations to help it become gaussian. For instance, use $log(x), log(x+1), x^{1/2}, x^{1/3},$ etc instead of $x$.
+
+When the current choice of features fails to differentiate an anomaly from normal examples, we should examine the anomaly and try to come up with a new feature from it and add it to the model.
+
+A useful general principle for the choice of features in anomaly detection is to choose features that are likely to take unusually large or small values in the case of an anomaly.
+\subsection{Multivariate Gaussian distribution}
+As mentioned above, we have been taking for granted that $p(x_i)$ are independent from each other. Instead of using $p(x) = \prod\limits_{i=1}^{n}p(x_i)$, we can model $p(x)$ all in one go with multvariate Gaussian distribution:
+\begin{equation}
+p(x;\mu,\Sigma) = \frac{1}{(2\pi)^{n/2}\left\lvert\Sigma\right\rvert^{1/2}}\exp\left(\frac{1}{2}(x-\mu)^{\mathsf T}\Sigma^{-1}(x-\mu)\right)
+\end{equation}
+in which $\Sigma$ is the covariance matrix. This is a better approach when the features chosen are correlated to each other closely. 
+
+When using multvariate Gaussian distribution, when given a training set $\{x^{(1)},\dots,x^{(m)}\}$, we can fit the model with 
+\begin{equation}
+\begin{split}
+\mu=&\frac{1}{m}\sum\limits_{i=1}^mx^{(i)}\\
+\Sigma=&\frac{1}{m}\sum\limits_{i=1}^m(x^{(i)}-\mu)(x^{(i)}-\mu)^{\mathsf T}.
+\end{split}
+\end{equation}
+When given a new example, we should calculate
+\begin{equation*}
+p(x) = \frac{1}{(2\pi)^{n/2}\left\lvert\Sigma\right\rvert^{1/2}}\exp\left(\frac{1}{2}(x-\mu)^{\mathsf T}\Sigma^{-1}(x-\mu)\right)
+\end{equation*}
+and flag an anomaly if it turns out that $p(x) < \epsilon$.
+
+It is not difficult to figure out that the original model used above is actually the multvariate gaussian model with 
+\begin{equation}
+\Sigma = \begin{bmatrix}
+\sigma_1^2\\
+&\sigma_2^2\\
+&&\ddots\\
+&&&\sigma_n^2
+\end{bmatrix}.
+\end{equation}
+
+When using the original model, we have to manually create extra features to capture anomalies that involve unusual combinations of existing features, while mulvariate gaussian model automatically captures the correlations between features. However, we should be cautious to use mulvariate gaussian when there are a lot of features because it is computationally more expensive (calculation of $\Sigma^{-1}$). What's more, mulvariate gaussian requires $m>n$ to ensure the invertibility of $\Sigma$. In practice, it should only be used when $m$ is sufficiently larger than $n$, e.g. $m>10n$.
+\section{Recommender systems}
+\subsection{Introduction}
+
+\ifx\PREAMBLE\undefined
+\end{document}
+\fi

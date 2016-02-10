@@ -1,0 +1,11 @@
+\BOOKMARK [1][-]{section.1}{Clustering}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{K-means algorithm}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Optimization objective}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.3}{Random initialisation}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.4}{Choice of K}{section.1}% 5
+\BOOKMARK [1][-]{section.2}{Dimensionality reduction}{}% 6
+\BOOKMARK [2][-]{subsection.2.1}{Formulation of PCA}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.2}{Implementation of PCA}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.3}{Mathematics of SVD}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.4}{Choice of k}{section.2}% 10
+\BOOKMARK [2][-]{subsection.2.5}{Good use v.s. bad use}{section.2}% 11

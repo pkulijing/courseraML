@@ -1,0 +1,101 @@
+\ifx\PREAMBLE\undefined
+\input{preamble}
+\begin{document}
+\fi
+\section{Logistic regression}
+\subsection{Hypothesis function and cost function}
+Recall that in supervised learning, when the output is discretely valued, the problem is said to be a classification problem. When there are only two classes, the problem is called a logistic regression problem. We will illustrate how to solve such problem.
+
+We use the hyphothesis function
+\begin{equation}
+h_{\theta}(x) = g(\theta^{\mathsf T}x) = \frac{1}{1+e^{-\theta^{\mathsf T}x}}
+\end{equation}
+where $g(z) = \frac{1}{1+e^{-z}}$ is called {\bf sigmoid function} or {\bf logistic function}.
+
+$h_{\theta}(x)$ can be interpreted as the probablity that $y=1$ with input $x$, i.e.
+$$h_{\theta}(x) = P(y = 1|x,\theta)$$
+
+If $h_{\theta}(x) \ge 0.5$, we predict that $y=1$; otherwise ($h_{\theta}(x) < 0.5$) we predict $y=0$. This gives us the decision boundry $\theta^{\mathsf T}x=0$. 
+
+Squared error cost function is no longer appropriate for logistic regression. We use the cost function
+\begin{equation}
+J(\theta) =-\frac{1}{m}\sum\limits_{i=1}^{m}\left(y^{(i)}\log(h_{\theta}(x^{(i)})) + (1-y^{(i)})\log(1-h_{\theta}(x^{(i)}))\right)
+\end{equation}
+
+The logistic regression problem can now be solved by minimize he cost function: $\min\limits_{\theta}J(\theta)$. Again we can apply gradient descent
+\begin{equation}
+\theta_j \coloneqq \theta_j - \frac{\alpha}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)})-y^{(i)}\right)x_j^{(i)}
+\end{equation}
+
+Some examples of more complex optimization algorithms: conjugate gradient, BFGS, L-BFGS. They do not require the manual selection of $\alpha$ and they are usually faster than gradient descent.
+
+\subsection{One-vs-all classification}
+When we have more than two classes, it is possible to solve the classification problem with the algorithm we have developped for logistic regression problems by using the socalled one-vs-all classification algorithm.
+
+For each class $y=i$, we fit a hypothesis function (regression classifier) $h_{\theta}^{(i)}(x)$ that can be interpreted as the probability of $y=i$, i.e.
+$$h_{\theta}^{(i)}(x) = P(y = i|x,\theta)$$
+
+Equiped with these classifiers, when asked to predict the output for a certain $x$, we choose the class $i$ that maximizes $h_{\theta}^{(i)}(x)$.
+\section{Regularization: solution to overfitting}
+When too many features are involved in the regression, we could end up with the overfitting problem: the learned hypothesis fits the training set very well so that $J(\theta)\approx0$, but fails to make good prediction for new examples.
+
+There are a few possible solutions to the overfitting problem.
+\begin{enumerate}
+\item Reduce number of features. Manual selection or using model selection algorithm, which will be covered later.
+\item Regularization. All features are kept but magnitudes of $\theta_j$s are reduced. 
+\end{enumerate}
+\subsection{Cost function of regularization}
+The principle of regularization is to reduce the magnitudes of parameters $\theta_j$. This can be achieved by adding a squared item to the cost function:
+$$J(\theta) = J_0(\theta) + \frac{\lambda}{2m}\sum\limits_{j=1}^{n}\theta_j^2$$
+By convention the added square item does not inclued $\theta_0$.
+\subsection{Regularized linear regression}
+For linear regression, we now have the new cost function
+\begin{equation}
+J(\theta) = \frac{1}{2m}\left[\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)^2 + \lambda\sum\limits_{j=1}^{n}\theta_j^2\right]
+\end{equation}
+And the iteration equation in gradient descent becomes
+\begin{equation}
+\begin{split}
+\theta_0 &\coloneqq \theta_0 - \frac{\alpha}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)
+x^{(i)}_0\\
+\theta_j &\coloneqq \theta_j - \alpha\left[\frac{1}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)
+x^{(i)}_j + \frac{\lambda}{m}\theta_j\right]\\
+&=\theta_j\left(1-\frac{\alpha\lambda}{m}\right)-\frac{\alpha}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)
+x^{(i)}_j, j = 1,2 \dots n
+\end{split}
+\end{equation}
+Intuitively, the $\left(1-\frac{\alpha\lambda}{m}\right)$ factor reduces the magnitude of $\theta_j$ at each iteration.
+
+The solution of the normal equation changes into
+\begin{equation}
+\theta = \left(X^{\mathsf T}X + \lambda
+\begin{bmatrix}
+0\\
+ &1\\
+ & &1\\
+ & & &\ddots\\
+ & & & &1\\	
+\end{bmatrix}
+\right)^{-1}X^{\mathsf T}y
+\end{equation}
+It can be proved that as long as $\lambda > 0$, the matrix to be inverted is invertible, which solves the problem of non-invertibility of $X^{\mathsf T}X$.
+\subsection{Regularized logistic regression}
+For logistic regression, we now have the cost function
+\begin{equation}
+J(\theta) = -\frac{1}{m}\sum\limits_{i=1}^{m}\left(y^{(i)}log(h_{\theta}(x^{(i)}))+(1-y^{(i)})log\left(1-h_{\theta}(x^{(i)})\right)\right) + \frac{\lambda}{2m}\sum\limits_{j=1}^{n}\theta_j^2
+\end{equation}
+And the iteration equation of gradient descent becomes
+\begin{equation}
+\begin{split}
+\theta_0 &\coloneqq \theta_0 - \frac{\alpha}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)
+x^{(i)}_0\\
+\theta_j &\coloneqq \theta_j - \alpha\left[\frac{1}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)
+x^{(i)}_j + \frac{\lambda}{m}\theta_j\right]\\
+&=\theta_j\left(1-\frac{\alpha\lambda}{m}\right)-\frac{\alpha}{m}\sum\limits_{i=1}^{m}\left(h_{\theta}(x^{(i)}) - y^{(i)}\right)
+x^{(i)}_j, j = 1,2 \dots n
+\end{split}
+\end{equation}
+which is actually the same as that of linear regression.
+\ifx\PREAMBLE\undefined
+\end{document}
+\fi

@@ -1,0 +1,14 @@
+\contentsline {figure}{\numberline {1}{\ignorespaces Basic logistic unit in a neural network\relax }}{7}{figure.caption.4}
+\contentsline {figure}{\numberline {2}{\ignorespaces A simple neural network\relax }}{7}{figure.caption.5}
+\contentsline {figure}{\numberline {3}{\ignorespaces Implementation of logical AND/OR with neural network\relax }}{8}{figure.caption.6}
+\contentsline {figure}{\numberline {4}{\ignorespaces Implementation of logical NOT with neural network\relax }}{8}{figure.caption.7}
+\contentsline {figure}{\numberline {5}{\ignorespaces Implementation of logical XNOR with neural network\relax }}{9}{figure.caption.8}
+\contentsline {figure}{\numberline {6}{\ignorespaces Diagnosing bias and variance with errors: different polynomial degrees\relax }}{13}{figure.caption.9}
+\contentsline {figure}{\numberline {7}{\ignorespaces Diagnosing bias and variance with errors: different regularization parameter\relax }}{14}{figure.caption.10}
+\contentsline {figure}{\numberline {8}{\ignorespaces A typical learning curve\relax }}{15}{figure.caption.11}
+\contentsline {figure}{\numberline {9}{\ignorespaces Learning curve with high bias\relax }}{15}{figure.caption.12}
+\contentsline {figure}{\numberline {10}{\ignorespaces Learning curve with high variance\relax }}{16}{figure.caption.13}
+\contentsline {figure}{\numberline {11}{\ignorespaces Image of cost1(z)\relax }}{19}{figure.caption.15}
+\contentsline {figure}{\numberline {12}{\ignorespaces Image of cost0(z)\relax }}{19}{figure.caption.16}
+\contentsline {figure}{\numberline {13}{\ignorespaces Intuition of large margin classification\relax }}{20}{figure.caption.17}
+\contentsline {figure}{\numberline {14}{\ignorespaces Mathematical background of large margin classification\relax }}{20}{figure.caption.18}
