@@ -55,5 +55,7 @@
 \BOOKMARK [2][-]{subsection.12.6}{Multivariate Gaussian distribution}{section.12}% 55
 \BOOKMARK [1][-]{section.13}{Recommender systems}{}% 56
 \BOOKMARK [2][-]{subsection.13.1}{Introduction}{section.13}% 57
-\BOOKMARK [1][-]{section.14}{Large scale machine learning}{}% 58
-\BOOKMARK [1][-]{section.15}{Example: photo OCR}{}% 59
+\BOOKMARK [2][-]{subsection.13.2}{Collaborative filtering algorithm}{section.13}% 58
+\BOOKMARK [2][-]{subsection.13.3}{Mean normalization}{section.13}% 59
+\BOOKMARK [1][-]{section.14}{Large scale machine learning}{}% 60
+\BOOKMARK [1][-]{section.15}{Example: photo OCR}{}% 61

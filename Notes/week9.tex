@@ -91,6 +91,86 @@ It is not difficult to figure out that the original model used above is actually
 When using the original model, we have to manually create extra features to capture anomalies that involve unusual combinations of existing features, while mulvariate gaussian model automatically captures the correlations between features. However, we should be cautious to use mulvariate gaussian when there are a lot of features because it is computationally more expensive (calculation of $\Sigma^{-1}$). What's more, mulvariate gaussian requires $m>n$ to ensure the invertibility of $\Sigma$. In practice, it should only be used when $m$ is sufficiently larger than $n$, e.g. $m>10n$.
 \section{Recommender systems}
 \subsection{Introduction}
+A recommender system aims at recommending for its users what can promisingly be of interest for them, e.g. books for customers visiting an online bookstore like Amazon, movies for a user of an online move database like IMDB, people that the user might want to add as friends on a social network like Facebook, etc. It is an important application of machine learning. It is interesting for us because it is one of the algorithms that do not call for manual choice of features.
+
+We will illustrate the components of general recommender system with a movie recommending system as an example. The system recommends movies for users based on ratings given by all users in the database as well as the user's personal rating history. We will denote the total number of movies in the database with $n_m$ and the total number of users with $n_u$. We will denote $r(i,j) = 1$ if the user $j$ has rated movie $i$, and $r(i,j) = 0$ otherwise. In the case $r(i,j) = 1$, the rating of movie $i$ given by user $j$ will be denoted as $y^{(i,j)}$. The number of movies that have been rated by user $j$ is denoted with $m^{(j)}$, i.e. $\sum\limits_{i}r(i,j) = m^{(j)}$.
+
+In order to make correct recommendation, the system will try to predict a user's rating for movies that he has not rated based on his personal taste, which is indicated by his rating history, as well as the category of the movie, which is indicated by other user's rating of the movie. If there are $n$ features to describe movies, we can use an $n$ dimension vector $\theta^{(j)}$ to represent user $j$'s taste, and an $n$ dimension vector $x^{(i)}$ to represent features of movie $i$. The rating of movie $i$ given by user $j$ could then be predicted with ${\theta^{(j)}}^{\mathsf T}x^{(i)}$.
+
+Suppose we already have the $x^{(i)}$ vectors, then we can learn $\theta^{(j)}$ by minimizing the cost function
+\begin{equation*}
+J(\theta^{(1)},\dots,\theta^{(n_u)}) = \frac{1}{2}
+\sum\limits_{j=1}^{n_u}\sum\limits_{i:r(i,j)=1}\left({\theta^{(j)}}^{\mathsf T}x^{(i)}-y^{(i,j)}\right)^2 + \frac{\lambda}{2}\sum\limits_{j=1}^{n_u}{\theta^{(j)}}^{\mathsf T}\theta^{(j)},
+\end{equation*}
+which could be conducted with gradient descent. Note that by convention, $\theta^{(j)}$ and $x^{(i)}$ does not contain bias component (the 0th component).
+
+\subsection{Collaborative filtering algorithm}
+In the previous section, we assumed that the $x^{(i)}$ vectors are already know, which is unrealistic in practice. Thus, rather than just learning $\theta^{(j)}$, we also have to learn $x^{(i)}$. Now the cost function to be minimized becomes
+\begin{equation}
+\begin{split}
+J(x^{(1)},\dots,x^{(n_m)},\theta^{(1)},\dots,\theta^{(n_u)}) = \frac{1}{2}
+\sum\limits_{(i,j):r(i,j)=1}\left({\theta^{(j)}}^{\mathsf T}x^{(i)}-y^{(i,j)}\right)^2 \\+ \frac{\lambda}{2}\sum\limits_{j=1}^{n_u}{\theta^{(j)}}^{\mathsf T}\theta^{(j)} + \frac{\lambda}{2}\sum\limits_{i=1}^{n_m}{x^{(i)}}^{\mathsf T}x^{(i)}.
+\end{split}\end{equation}
+It can be minimized using gradient descent:
+\begin{equation}
+\begin{split}
+x^{(i)}\coloneqq x^{(i)} - \alpha\left(\sum\limits_{j:r(i,j)=1}\left({\theta^{(j)}}^{\mathsf T}x^{(i)}-y^{(i,j)}\right)\theta^{(j)} + \lambda x^{(i)}\right)\\
+\theta^{(j)}\coloneqq \theta^{(j)} - \alpha\left(\sum\limits_{i:r(i,j)=1}\left({\theta^{(j)}}^{\mathsf T}x^{(i)}-y^{(i,j)}\right)x^{(i)} + \lambda \theta^{(j)}\right)\\
+\end{split}\end{equation}
+The algorithm is called collaborative filtering algorithm. After we have learned the parameters, we can use them to predict users' ratings for movies. Note that before minimizing the cost function, we have to initialize $x^{(i)}$ and $\theta^{(j)}$ to random small values in order to break the symmetry.
+
+The algorithm could be written in a vectorized way. We will use two matrices $X$ and $\Theta$ defined as follows:
+\begin{equation}
+X = \begin{bmatrix}
+\text{---}{x^{(1)}}^{\mathsf T}\text{---}\\
+\text{---}{x^{(2)}}^{\mathsf T}\text{---}\\
+\dots\\
+\text{---}{x^{(n_m)}}^{\mathsf T}\text{---}
+\end{bmatrix}, 
+\Theta = \begin{bmatrix}
+\text{---}{\theta^{(1)}}^{\mathsf T}\text{---}\\
+\text{---}{\theta^{(2)}}^{\mathsf T}\text{---}\\
+\dots\\
+\text{---}{\theta^{(n_u)}}^{\mathsf T}\text{---}
+\end{bmatrix}.
+\end{equation}
+Then the $n_m\times n_u$ matrix that stores the prediction of the ratings of all movies by all users could simply be expressed by $X\Theta^{\mathsf T}$. This is called {\bf low rank matrix factorization}. In Matlab, the vectorized implementation of the cost function and its derivatives is as follows:
+\begin{lstlisting}
+J = 0.5 * sum(sum(((X * Theta' - Y) .* R) .^ 2)) + ...
+    0.5 * lambda * (sum(sum(Theta .^ 2)) + sum(sum(X .^ 2)));
+X_grad = ((X * Theta' - Y) .* R) * Theta + lambda * X;
+Theta_grad = ((X * Theta' - Y) .* R)' * X + lambda * Theta;
+\end{lstlisting}
+
+With $x^{(i)}$ and $\theta^{(j)}$ learned, we can recommend unwatched movies for a specific user: simply choose the movies that he has not rated with the highest predicted ratings. We can also find movies that are the most ``similar'' to a given movie $i$: simply find movies $j$ with the smallest $\lVert x^{(i)} - x^{(j)}\rVert$.
+
+\subsection{Mean normalization}
+If a user has never rated any movie, i.e. $r(i,j) = 0$ for all $i$, we will end up with $\theta^{(j)}$ being a vector with all elements equal to 0. As a result, the prediction for ratings of all movies by the user will be 0, which is not helpful at all for the recommendation. A reasonable choice is to use the average rating of other users as the prediction for this user. In order to accomplish this, we have to implement {\bf mean normalization}.
+
+For each movie, we will calculate its average rating, and store the result in vector $\mu$. Then we will substract the average rating from all available rating results, and use the substracted results in the algorithm. Finally, the prediction of user $j$'s rating for movie $i$ will be ${\theta^{(j)}}^{\mathsf T}x^{(i)} + \mu_i$. This accomplishes mean normalization because it ensures that for a user without any rating history (thus $\theta^{(j)} = 0$), the prediction is the average rating $\mu_i$, while the predictions for other users remain untouched.
+
+As an example, if the rating data we have is 
+$Y=\begin{bmatrix}
+5&5&0&0&?\\
+5&?&0&?&?\\
+?&4&0&?&?\\
+0&0&5&4&?\\
+0&0&5&0&?
+\end{bmatrix}$, then $\mu = 
+\begin{bmatrix}
+2.5\\
+2.5\\
+2\\
+2.25\\
+1.25
+\end{bmatrix}$, and $Y$ should be changed to
+$Y=\begin{bmatrix}
+2.5&2.5&-2.5&-2.5&?\\
+2.5&?&-2.5&?&?\\
+?&2&-2&?&?\\
+-2.25&-2.25&2.75&1.75&?\\
+-1.25&-1.25&3.75&-1.25&?
+\end{bmatrix}.$
 
 \ifx\PREAMBLE\undefined
 \end{document}
