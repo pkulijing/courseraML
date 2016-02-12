@@ -1,0 +1,7 @@
+\BOOKMARK [1][-]{section.1}{Large scale machine learning}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Problem with large scale data}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Stochastic gradient descent}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.3}{Mini batch gradient descent}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.4}{Convergence}{section.1}% 5
+\BOOKMARK [2][-]{subsection.1.5}{Online learning}{section.1}% 6
+\BOOKMARK [2][-]{subsection.1.6}{Map/reduce and parallelism}{section.1}% 7

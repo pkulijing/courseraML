@@ -58,4 +58,10 @@
 \BOOKMARK [2][-]{subsection.13.2}{Collaborative filtering algorithm}{section.13}% 58
 \BOOKMARK [2][-]{subsection.13.3}{Mean normalization}{section.13}% 59
 \BOOKMARK [1][-]{section.14}{Large scale machine learning}{}% 60
-\BOOKMARK [1][-]{section.15}{Example: photo OCR}{}% 61
+\BOOKMARK [2][-]{subsection.14.1}{Problem with large scale data}{section.14}% 61
+\BOOKMARK [2][-]{subsection.14.2}{Stochastic gradient descent}{section.14}% 62
+\BOOKMARK [2][-]{subsection.14.3}{Mini batch gradient descent}{section.14}% 63
+\BOOKMARK [2][-]{subsection.14.4}{Convergence}{section.14}% 64
+\BOOKMARK [2][-]{subsection.14.5}{Online learning}{section.14}% 65
+\BOOKMARK [2][-]{subsection.14.6}{Map/reduce and parallelism}{section.14}% 66
+\BOOKMARK [1][-]{section.15}{Example: photo OCR}{}% 67
