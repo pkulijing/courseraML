@@ -65,3 +65,7 @@
 \BOOKMARK [2][-]{subsection.14.5}{Online learning}{section.14}% 65
 \BOOKMARK [2][-]{subsection.14.6}{Map/reduce and parallelism}{section.14}% 66
 \BOOKMARK [1][-]{section.15}{Example: photo OCR}{}% 67
+\BOOKMARK [2][-]{subsection.15.1}{Problem description}{section.15}% 68
+\BOOKMARK [2][-]{subsection.15.2}{Sliding windows}{section.15}% 69
+\BOOKMARK [2][-]{subsection.15.3}{Artificial data synthesis}{section.15}% 70
+\BOOKMARK [2][-]{subsection.15.4}{Ceiling analysis}{section.15}% 71

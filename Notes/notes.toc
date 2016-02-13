@@ -65,3 +65,7 @@
 \contentsline {subsection}{\numberline {14.5}Online learning}{33}{subsection.14.5}
 \contentsline {subsection}{\numberline {14.6}Map/reduce and parallelism}{33}{subsection.14.6}
 \contentsline {section}{\numberline {15}Example: photo OCR}{33}{section.15}
+\contentsline {subsection}{\numberline {15.1}Problem description}{33}{subsection.15.1}
+\contentsline {subsection}{\numberline {15.2}Sliding windows}{34}{subsection.15.2}
+\contentsline {subsection}{\numberline {15.3}Artificial data synthesis}{34}{subsection.15.3}
+\contentsline {subsection}{\numberline {15.4}Ceiling analysis}{35}{subsection.15.4}
